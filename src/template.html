@@ -6,6 +6,74 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>hello world</h1>
+    <div class="layout-container">
+        <div class="header-container">
+            <h1 class="header-title">Todo Simply</h1>
+        </div>
+            
+        <div class="sidebar-container">
+            <div class="project-list-header">
+                <h2>Projects</h2>
+                <button id="project-modal-btn">New Project +</button>
+            </div>
+            
+            <ul class="project-list"></ul>
+        </div>
+
+        <div class="content">
+            <div class="todo-container">
+                <div class="todo-header-container">
+                    <h2>Todos</h2>
+                    <button id="todo-modal-btn">New Todo +</button>
+                </div>
+                <div class="todo-list"></div>
+                <!-- TODO CARD TESTING. DELETE AFTER! -->
+                <div class="todo-card">
+                    <span class="todo-font">Study Session</span>
+                    <span class="todo-font">Due: 02/21/26</span>
+                    <span class="todo-font todo-priority four">4</span>
+                    <button class="todo-delete">X</button>
+                    <button class="todo-edit"></button>
+                </div>
+                <!-- END OF BLOCK -->
+            </div>
+        </div>        
+    </div>
+
+    <!-- MODALS -->
+    <dialog id="project-modal">
+        <h3>Create new project</h3>
+        <form method="dialog" id="project-form">
+            <label for="project-input">Project</label>
+            <input id="project-input" type="text" placeholder="Project name..." required>
+            <button id="project-create-btn" type="submit">Create project</button>
+            <button id="project-cancel-btn" type="button">Cancel</button>
+        </form>
+    </dialog>
+
+    <dialog id="todo-modal">
+        <h3>Create new todo</h3>
+        <form method="dialog" id="todo-form">
+            <label for="todo-title-input">Title</label>
+            <input id="todo-title-input" type="text" required>
+
+            <label for="todo-description-input">Description</label>
+            <textarea id="todo-description-input" maxlength="200"></textarea>
+
+            <label for="todo-dueDate-input">Due date</label>
+            <input id="todo-dueDate-input" type="date" required>
+
+            <label for="todo-priority-input">Priority</label>
+            <select name="priority" id="todo-priority-input" required>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+            </select>
+
+            <button id="todo-create-btn" type="submit">Add todo</button>
+            <button id="todo-cancel-btn" type="button">Cancel</button>
+        </form>
+    </dialog>
 </body>
 </html>
