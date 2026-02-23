@@ -30,7 +30,7 @@
             </div>
         </div>        
     </div>
-
+    
     <!-- MODALS -->
 
     <dialog id="project-modal">
@@ -78,6 +78,41 @@
             <div class="modal-btn-container">
                 <button id="todo-cancel-btn" type="button">Cancel</button>
                 <button id="todo-create-btn" type="submit">Add todo</button>
+            </div>
+        </form>
+    </dialog>
+    
+    <dialog id="edit-modal">
+        <h3>Edit todo</h3>
+        <form method="dialog" id="edit-form">
+            <div class="input-container">
+                <label for="edit-title-input">Title*</label>
+                <input id="edit-title-input" type="text" required>
+            </div>
+            <div class="input-container">
+                <label for="edit-dueDate-input">Due date*</label>
+                <input id="edit-dueDate-input" type="date" required>
+            </div>
+            <div class="input-container">
+                <label for="edit-time-input">Time</label>
+                <input id="edit-time-input" type="time">
+            </div>
+            <div class="input-container">
+                <label for="edit-priority-input">Priority</label>
+                <select name="priority" id="edit-priority-input" required>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="edit-description-input">Description</label>
+                <textarea id="edit-description-input" maxlength="200"></textarea>
+            </div>
+            <div class="modal-btn-container">
+                <button id="edit-cancel-btn" type="button">Cancel</button>
+                <button id="edit-create-btn" type="submit">Confirm changes</button>
             </div>
         </form>
     </div>

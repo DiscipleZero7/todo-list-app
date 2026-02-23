@@ -38,6 +38,7 @@ function createProject(title) {
         title,
         todos: [],
         completed: [],
+        selectedTodo: null,
         
         addTodo(title, description, dueDate, priority, time) {
             this.todos.push(createTodo(title, description, dueDate, priority, time))
@@ -51,6 +52,20 @@ function createProject(title) {
         completeTodo(id) {
             const index = this.todos.findIndex(e => e.id === id);
             this.completed.push(this.todos.splice(index, 1)[0]);
+        },
+
+        editTodo(id, newTitle, newDescription, newPriority, newTime, newDate) {
+            const index = this.todos.findIndex(e => e.id === id);
+            this.todos[index].title = newTitle;
+            this.todos[index].description = newDescription;
+            this.todos[index].priority = newPriority;
+            this.todos[index].time = newTime;
+
+            if (newTime === "") {
+            this.todos[index].dueDate = new Date(newDate)
+            } else {
+                this.todos[index].dueDate = new Date(newDate+"T"+newTime)
+            }
         }
     }
 }
@@ -71,11 +86,13 @@ const DOM = {
         todoModal: document.querySelector("#todo-modal-btn"),
         todoCreate: document.querySelector("#todo-create-btn"),
         todoCancel: document.querySelector("#todo-cancel-btn"),
+        editCancel: document.querySelector("#edit-cancel-btn"),
     },
 
     modal: {
         project: document.querySelector("#project-modal"),
         todo: document.querySelector("#todo-modal"),
+        edit: document.querySelector("#edit-modal"),
     },
 
     info: {
@@ -85,6 +102,7 @@ const DOM = {
     form: {
         project: document.querySelector("#project-form"),
         todo: document.querySelector("#todo-form"),
+        edit: document.querySelector("#edit-form"),
     }
 }
 
@@ -127,7 +145,6 @@ DOM.form.todo.addEventListener("submit", () => {
     const todoTitle = document.querySelector("#todo-title-input").value;
     const todoDescription = document.querySelector("#todo-description-input").value;
     //Due Date to object
-    //Need to fix no time selection
     const todoDueDate = document.querySelector("#todo-dueDate-input").value;
     const todoDueTime = document.querySelector("#todo-time-input").value;
     let finalDate;
@@ -136,13 +153,27 @@ DOM.form.todo.addEventListener("submit", () => {
     } else {
         finalDate = new Date(todoDueDate+"T"+todoDueTime)
     }
-    console.log(projectManager)
     ////////////////
     const todoPriority = document.querySelector("#todo-priority-input").value;
 
     projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
-    renderFull();
+    renderTodos(projectManager.selectedProject);
     DOM.form.todo.reset();
+})
+
+// Edit form NEED TO REFACTOR BIG TIME!!
+DOM.form.edit.addEventListener("submit", () => {
+    projectManager.projects[projectManager.selectedProject].editTodo(projectManager.projects[projectManager.selectedProject].selectedTodo, 
+        document.querySelector("#edit-title-input").value,
+        document.querySelector("#edit-description-input").value,
+        document.querySelector("#edit-priority-input").value,
+        document.querySelector("#edit-time-input").value,
+        document.querySelector("#edit-dueDate-input").value,)
+    renderFull();
+})
+
+DOM.button.editCancel.addEventListener("click", () => {
+    DOM.modal.edit.close();
 })
 //-------------------------
 
@@ -261,6 +292,17 @@ function createDOMTodosCards(todo) {
     todoComplete.addEventListener("click", () => {
         projectManager.projects[projectManager.selectedProject].completeTodo(todo.id)
         renderFull();
+    })
+
+    todoEdit.addEventListener("click", () => {
+        document.querySelector("#edit-title-input").value = todo.title;
+        document.querySelector("#edit-dueDate-input").value = format(todo.dueDate, "yyyy-MM-dd");
+        document.querySelector("#edit-time-input").value = todo.time;
+        document.querySelector("#edit-priority-input").value = todo.priority;
+        document.querySelector("#edit-description-input").value = todo.description;
+
+        projectManager.projects[projectManager.selectedProject].selectedTodo = todo.id;
+        DOM.modal.edit.showModal();
     })
 
     todoDelete.addEventListener("click", () => {
