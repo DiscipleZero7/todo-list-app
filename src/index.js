@@ -1,6 +1,13 @@
 import "./styles.css";
 import folder from "./icons/folder.svg";
 import pencil from "./icons/pencil.svg";
+import checkmark from "./icons/check-bold.svg";
+
+//Date-fns testing//
+import { addDays, format } from "date-fns";
+const date = new Date();
+//console.log(format(date, "ccc, LLL d, k:mm a"))
+//////////
 
 /*export*/ const projectManager = {
     projects: {
@@ -22,22 +29,28 @@ import pencil from "./icons/pencil.svg";
     }
 }
 
-function createTodo(title, description, dueDate, priority) {
-    return { title, description, dueDate, priority, id: crypto.randomUUID() }
+function createTodo(title, description, dueDate, priority, time) {
+    return { title, description, dueDate, priority, id: crypto.randomUUID(), time }
 }
 
 function createProject(title) {
     return {
         title,
         todos: [],
+        completed: [],
         
-        addTodo(title, description, dueDate, priority) {
-            this.todos.push(createTodo(title, description, dueDate, priority))
+        addTodo(title, description, dueDate, priority, time) {
+            this.todos.push(createTodo(title, description, dueDate, priority, time))
         },
 
         removeTodo(id) {
             const index = this.todos.findIndex(e => e.id === id);
             this.todos.splice(index, 1);
+        },
+
+        completeTodo(id) {
+            const index = this.todos.findIndex(e => e.id === id);
+            this.completed.push(this.todos.splice(index, 1)[0]);
         }
     }
 }
@@ -113,10 +126,21 @@ DOM.button.todoCancel.addEventListener("click", () => {
 DOM.form.todo.addEventListener("submit", () => {
     const todoTitle = document.querySelector("#todo-title-input").value;
     const todoDescription = document.querySelector("#todo-description-input").value;
+    //Due Date to object
+    //Need to fix no time selection
     const todoDueDate = document.querySelector("#todo-dueDate-input").value;
+    const todoDueTime = document.querySelector("#todo-time-input").value;
+    let finalDate;
+    if (todoDueTime === "") {
+        finalDate = new Date(todoDueDate)
+    } else {
+        finalDate = new Date(todoDueDate+"T"+todoDueTime)
+    }
+    console.log(projectManager)
+    ////////////////
     const todoPriority = document.querySelector("#todo-priority-input").value;
 
-    projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, todoDueDate, todoPriority)
+    projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
     renderFull();
     DOM.form.todo.reset();
 })
@@ -192,6 +216,7 @@ function renderTodos(projectName) {
 function createDOMTodosCards(todo) {
     const todoCard = document.createElement("div");
 
+    const todoComplete = document.createElement("button");
     const todoTitle = document.createElement("span");
     const todoDescription = document.createElement("span");
     const todoDueDate = document.createElement("span");
@@ -201,7 +226,15 @@ function createDOMTodosCards(todo) {
 
     todoTitle.textContent = `${todo.title}`;
     todoDescription.textContent = `${todo.description}`;
-    todoDueDate.textContent = `Due: ${todo.dueDate}`;
+
+    //todoDueDate.textContent = `Due: ${todo.dueDate}`;
+    if (todo.time === "") {
+        todoDueDate.textContent = format(todo.dueDate, "ccc, LLL d");
+    } else {
+        todoDueDate.textContent = format(todo.dueDate, "ccc, LLL d, K:mm a");
+    }
+       
+
     todoPriority.textContent = `${todo.priority}`;
     todoDelete.textContent = `X`;
 
@@ -209,6 +242,7 @@ function createDOMTodosCards(todo) {
     todoPriority.classList.add("todo-priority")
     todoDelete.classList.add("todo-delete");
     todoEdit.classList.add("todo-edit")
+    todoComplete.classList.add("todo-complete");
 
     switch (todo.priority) {
         case "1":
@@ -224,11 +258,17 @@ function createDOMTodosCards(todo) {
             todoPriority.classList.add("four");
     }
 
+    todoComplete.addEventListener("click", () => {
+        projectManager.projects[projectManager.selectedProject].completeTodo(todo.id)
+        renderFull();
+    })
+
     todoDelete.addEventListener("click", () => {
         projectManager.projects[projectManager.selectedProject].removeTodo(todo.id)
         renderFull();
     })
 
+    todoCard.appendChild(todoComplete);
     todoCard.appendChild(todoTitle);
     //todoCard.appendChild(todoDescription);
     todoCard.appendChild(todoDueDate);

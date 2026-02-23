@@ -27,53 +27,59 @@
                     <button id="todo-modal-btn">New Todo +</button>
                 </div>
                 <div class="todo-list"></div>
-                <!-- TODO CARD TESTING. DELETE AFTER! -->
-                <div class="todo-card">
-                    <span class="todo-font">Study Session</span>
-                    <span class="todo-font">Due: 02/21/26</span>
-                    <span class="todo-font todo-priority four">4</span>
-                    <button class="todo-delete">X</button>
-                    <button class="todo-edit"></button>
-                </div>
-                <!-- END OF BLOCK -->
             </div>
         </div>        
     </div>
 
     <!-- MODALS -->
+
     <dialog id="project-modal">
-        <h3>Create new project</h3>
+        <h3>Create new project folder to store your todos</h3>
         <form method="dialog" id="project-form">
-            <label for="project-input">Project</label>
-            <input id="project-input" type="text" placeholder="Project name..." required>
-            <button id="project-create-btn" type="submit">Create project</button>
-            <button id="project-cancel-btn" type="button">Cancel</button>
+            <div class="input-container">
+                <label for="project-input">Project</label>
+                <input id="project-input" type="text" placeholder="Project name..." required>
+            </div>
+            <div class="modal-btn-container">
+                <button id="project-cancel-btn" type="button">Cancel</button>
+                <button id="project-create-btn" type="submit">Done</button>
+            </div>
         </form>
     </dialog>
 
     <dialog id="todo-modal">
         <h3>Create new todo</h3>
         <form method="dialog" id="todo-form">
-            <label for="todo-title-input">Title</label>
-            <input id="todo-title-input" type="text" required>
-
-            <label for="todo-description-input">Description</label>
-            <textarea id="todo-description-input" maxlength="200"></textarea>
-
-            <label for="todo-dueDate-input">Due date</label>
-            <input id="todo-dueDate-input" type="date" required>
-
-            <label for="todo-priority-input">Priority</label>
-            <select name="priority" id="todo-priority-input" required>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-                <option value="1">1</option>
-            </select>
-
-            <button id="todo-create-btn" type="submit">Add todo</button>
-            <button id="todo-cancel-btn" type="button">Cancel</button>
+            <div class="input-container">
+                <label for="todo-title-input">Title*</label>
+                <input id="todo-title-input" type="text" required>
+            </div>
+            <div class="input-container">
+                <label for="todo-dueDate-input">Due date*</label>
+                <input id="todo-dueDate-input" type="date" required>
+            </div>
+            <div class="input-container">
+                <label for="todo-time-input">Time</label>
+                <input id="todo-time-input" type="time">
+            </div>
+            <div class="input-container">
+                <label for="todo-priority-input">Priority</label>
+                <select name="priority" id="todo-priority-input" required>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="todo-description-input">Description</label>
+                <textarea id="todo-description-input" maxlength="200"></textarea>
+            </div>
+            <div class="modal-btn-container">
+                <button id="todo-cancel-btn" type="button">Cancel</button>
+                <button id="todo-create-btn" type="submit">Add todo</button>
+            </div>
         </form>
-    </dialog>
+    </div>
 </body>
 </html>
