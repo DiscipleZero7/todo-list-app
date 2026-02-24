@@ -161,7 +161,7 @@ DOM.form.todo.addEventListener("submit", () => {
     const todoPriority = document.querySelector("#todo-priority-input").value;
 
     projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
-    renderTodos(projectManager.selectedProject);
+    renderUpcoming(projectManager.selectedProject);
     DOM.form.todo.reset();
 })
 
@@ -225,7 +225,7 @@ function createDOMProjectCards(projectName) {
 
         projectCard.classList.add("selected");
         
-        renderTodos(projectManager.selectedProject);
+        renderUpcoming(projectManager.selectedProject);
     }, true)
 
     projectCard.appendChild(image);
@@ -235,7 +235,7 @@ function createDOMProjectCards(projectName) {
     return projectCard;
 }
 
-function renderTodos(projectName) {
+function renderUpcoming(projectName) {
     DOM.container.todos.innerHTML = "";
 
     if (projectManager.selectedProject === null) {
@@ -244,7 +244,10 @@ function renderTodos(projectName) {
     
     for (let i of projectManager.projects[projectName].todos) {
         const todo = i;
-        createDOMTodosCards(todo);
+
+        if (!isPast(todo.dueDate)) {
+            createDOMTodosCards(todo);
+        }
     }
 }
 
@@ -376,15 +379,15 @@ function createDOMCompletedCards(todo) {
 
 function renderFull() {
     renderProjects();
-    renderTodos(projectManager.selectedProject);
+    renderUpcoming(projectManager.selectedProject);
 }
 
 
 function renderCurrentTab(tab) {
     switch (tab) {
         case "upcoming":
-            renderTodos(projectManager.selectedProject);
-            breakl
+            renderUpcoming(projectManager.selectedProject);
+            break;
         
         case "overdue":
             renderOverdue(projectManager.selectedProject);
@@ -401,15 +404,30 @@ const upcomingBtn = document.querySelector("#upcoming-btn");
 const overdueBtn = document.querySelector("#overdue-btn");
 
 completedBtn.addEventListener("click", () => {
-    renderCompleted(projectManager.selectedProject);
+    if (projectManager.selectedProject === null) {
+        alert("SELECT A PROJECT FOO!");
+        return;
+    }
+    projectManager.projects[projectManager.selectedProject].selectedTab = "completed";
+    renderCurrentTab(projectManager.projects[projectManager.selectedProject].selectedTab)
 })
 
 upcomingBtn.addEventListener("click", () => {
-    renderTodos(projectManager.selectedProject);
+    if (projectManager.selectedProject === null) {
+        alert("SELECT A PROJECT FOO!");
+        return;
+    }
+    projectManager.projects[projectManager.selectedProject].selectedTab = "upcoming";
+    renderCurrentTab(projectManager.projects[projectManager.selectedProject].selectedTab)
 })
 
 overdueBtn.addEventListener("click", () => {
-    renderOverdue(projectManager.selectedProject);
+    if (projectManager.selectedProject === null) {
+        alert("SELECT A PROJECT FOO!");
+        return;
+    }
+    projectManager.projects[projectManager.selectedProject].selectedTab = "overdue";
+    renderCurrentTab(projectManager.projects[projectManager.selectedProject].selectedTab)
 })
 
 //Experimental branch 2
