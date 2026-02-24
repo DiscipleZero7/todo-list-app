@@ -4,7 +4,7 @@ import pencil from "./icons/pencil.svg";
 import checkmark from "./icons/check-bold.svg";
 
 //Date-fns testing//
-import { addDays, format } from "date-fns";
+import { addDays, format, isPast } from "date-fns";
 const date = new Date();
 //console.log(format(date, "ccc, LLL d, k:mm a"))
 //////////
@@ -38,6 +38,7 @@ function createProject(title) {
         title,
         todos: [],
         completed: [],
+        selectedTab: "upcoming",
         selectedTodo: null,
         
         addTodo(title, description, dueDate, priority, time) {
@@ -51,6 +52,7 @@ function createProject(title) {
 
         completeTodo(id) {
             const index = this.todos.findIndex(e => e.id === id);
+            this.todos[index].timeCompleted = format(new Date(Date.now()), "ccc, LLL d, h:mm a");
             this.completed.push(this.todos.splice(index, 1)[0]);
         },
 
@@ -149,7 +151,9 @@ DOM.form.todo.addEventListener("submit", () => {
     const todoDueTime = document.querySelector("#todo-time-input").value;
     let finalDate;
     if (todoDueTime === "") {
-        finalDate = new Date(todoDueDate)
+        finalDate = new Date(todoDueDate);
+        finalDate.setMinutes(finalDate.getTimezoneOffset());
+        console.log(projectManager)
     } else {
         finalDate = new Date(todoDueDate+"T"+todoDueTime)
     }
@@ -244,6 +248,35 @@ function renderTodos(projectName) {
     }
 }
 
+function renderCompleted(projectName) {
+    DOM.container.todos.innerHTML = "";
+
+    if (projectManager.selectedProject === null) {
+        return;
+    }
+    
+    for (let i of projectManager.projects[projectName].completed) {
+        const todo = i;
+        createDOMCompletedCards(todo);
+    }
+}
+
+function renderOverdue(projectName) {
+    DOM.container.todos.innerHTML = "";
+    
+    if (projectManager.selectedProject === null) {
+        return;
+    }
+    
+    for (let i of projectManager.projects[projectName].todos) {
+        const todo = i;
+
+        if (isPast(todo.dueDate)) {
+            createDOMTodosCards(todo);
+        }
+    }
+}
+
 function createDOMTodosCards(todo) {
     const todoCard = document.createElement("div");
 
@@ -262,7 +295,7 @@ function createDOMTodosCards(todo) {
     if (todo.time === "") {
         todoDueDate.textContent = format(todo.dueDate, "ccc, LLL d");
     } else {
-        todoDueDate.textContent = format(todo.dueDate, "ccc, LLL d, K:mm a");
+        todoDueDate.textContent = format(todo.dueDate, "ccc, LLL d, h:mm a");
     }
        
 
@@ -321,6 +354,22 @@ function createDOMTodosCards(todo) {
     DOM.container.todos.appendChild(todoCard);
 }
 
+function createDOMCompletedCards(todo) {
+    const todoCard = document.createElement("div");
+
+    const todoTitle = document.createElement("span");
+    const todoCompletedDate = document.createElement("span");
+
+    todoTitle.textContent = `${todo.title}`;
+    todoCompletedDate.textContent = `Completed on: ${todo.timeCompleted}`;
+       
+    todoCard.classList.add("todo-card");
+
+    todoCard.appendChild(todoTitle);
+    todoCard.appendChild(todoCompletedDate);
+
+    DOM.container.todos.appendChild(todoCard);
+}
 //***************//
 //  DEV DISPLAY //
 //*************//
@@ -329,5 +378,38 @@ function renderFull() {
     renderProjects();
     renderTodos(projectManager.selectedProject);
 }
+
+
+function renderCurrentTab(tab) {
+    switch (tab) {
+        case "upcoming":
+            renderTodos(projectManager.selectedProject);
+            breakl
+        
+        case "overdue":
+            renderOverdue(projectManager.selectedProject);
+            break;
+
+        case "completed": 
+            renderCompleted(projectManager.selectedProject);
+    }
+}
+
+
+const completedBtn = document.querySelector("#completed-btn");
+const upcomingBtn = document.querySelector("#upcoming-btn");
+const overdueBtn = document.querySelector("#overdue-btn");
+
+completedBtn.addEventListener("click", () => {
+    renderCompleted(projectManager.selectedProject);
+})
+
+upcomingBtn.addEventListener("click", () => {
+    renderTodos(projectManager.selectedProject);
+})
+
+overdueBtn.addEventListener("click", () => {
+    renderOverdue(projectManager.selectedProject);
+})
 
 //Experimental branch
