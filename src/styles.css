@@ -141,6 +141,10 @@ label {
     background-color: lightgray;
 }
 
+.project-list-item.selected:hover {
+    color: black;
+}
+
 .project-list-item > span {
     font-size: 1.8rem;
 }
@@ -291,4 +295,14 @@ label {
     width: 30px;
     height: 30px;
     border: none;
+}
+
+.no-project-container {
+    width: 15%;
+    margin: auto;
+    margin-top: 15%;
+}
+
+.no-project-container > img {
+    filter: invert(75%);
 }

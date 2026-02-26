@@ -2,6 +2,8 @@ import "./styles.css";
 import folder from "./icons/folder.svg";
 import pencil from "./icons/pencil.svg";
 import checkmark from "./icons/check-bold.svg";
+import clock from "./icons/clock-alert.svg";
+import note from "./icons/note-edit.svg";
 
 //Date-fns testing//
 import { addDays, format, isPast } from "date-fns";
@@ -79,6 +81,7 @@ const DOM = {
     container: {
         projects: document.querySelector(".project-list"),
         todos: document.querySelector(".todo-list"),
+        noProject: document.querySelector(".no-project-container"),
     },
 
     button: {
@@ -113,6 +116,7 @@ const DOM = {
 
 // Static DOM elements
 DOM.button.filterUpcoming.addEventListener("click", () => {
+    projectManager.selectedTab = "upcoming";
     if (projectManager.selectedProject !== null) {
         if (document.querySelector(".filter-btn.selected")) {
             document.querySelector(".filter-btn.selected").classList.remove("selected");
@@ -125,6 +129,7 @@ DOM.button.filterUpcoming.addEventListener("click", () => {
 })
 
 DOM.button.filterOverdue.addEventListener("click", () => {
+    projectManager.selectedTab = "overdue";
     if (projectManager.selectedProject !== null) {
         if (document.querySelector(".filter-btn.selected")) {
             document.querySelector(".filter-btn.selected").classList.remove("selected");
@@ -137,6 +142,7 @@ DOM.button.filterOverdue.addEventListener("click", () => {
 })
 
 DOM.button.filterCompleted.addEventListener("click", () => {
+    projectManager.selectedTab = "completed";
     if (projectManager.selectedProject !== null) {
         if (document.querySelector(".filter-btn.selected")) {
             document.querySelector(".filter-btn.selected").classList.remove("selected");
@@ -162,7 +168,12 @@ DOM.form.project.addEventListener("submit", () => {
     const newProjectName = document.querySelector("#project-input").value;
     projectManager.addProject(newProjectName);
     DOM.form.project.reset();
-    renderFull();
+    projectManager.selectedProject = newProjectName;
+    projectManager.selectedTab = "upcoming";
+    document.querySelector(".filter-btn.selected")?.classList.remove("selected");
+    document.querySelector("#upcoming-btn").classList.add("selected");
+    renderProjects();
+    renderCurrentTab(projectManager.selectedTab);
 })
 
 //**********
@@ -199,7 +210,8 @@ DOM.form.todo.addEventListener("submit", () => {
     const todoPriority = document.querySelector("#todo-priority-input").value;
 
     projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
-    renderUpcoming(projectManager.selectedProject);
+
+    renderCurrentTab(projectManager.selectedTab);
     DOM.form.todo.reset();
 })
 
@@ -211,7 +223,8 @@ DOM.form.edit.addEventListener("submit", () => {
         document.querySelector("#edit-priority-input").value,
         document.querySelector("#edit-time-input").value,
         document.querySelector("#edit-dueDate-input").value,)
-    renderFull();
+    renderProjects();
+    renderCurrentTab(projectManager.selectedTab);
 })
 
 DOM.button.editCancel.addEventListener("click", () => {
@@ -219,15 +232,43 @@ DOM.button.editCancel.addEventListener("click", () => {
 })
 //-------------------------
 
-renderFull();
+renderProjects();
+renderCurrentTab(projectManager.selectedTab);
 
 
 // DOM functions
 function renderProjects() {
     DOM.container.projects.innerHTML = "";
+    DOM.container.noProject.innerHTML = "";
 
     for (let projectName in projectManager.projects) {
         DOM.container.projects.appendChild(createDOMProjectCards(projectName));
+    }
+
+    if (projectManager.selectedProject === null) {
+        
+        document.querySelector(".filter-btn.selected")?.classList.remove("selected");
+        const image = document.createElement("img");
+        const noProjectSelectedText = document.createElement("h3");
+
+        image.src = folder
+        noProjectSelectedText.textContent = "No project selected";
+
+        DOM.container.noProject.appendChild(image);
+        DOM.container.noProject.appendChild(noProjectSelectedText);
+    } else {
+        if (document.querySelector(".project-list-item.selected")) {
+            document.querySelector(".project-list-item.selected").classList.remove("selected")
+            
+        }
+
+        const listItems = document.querySelectorAll(".project-list-item");
+
+        for (const item of listItems) {
+            if (item.querySelector("span").textContent === projectManager.selectedProject) {
+                item.classList.add("selected");
+            }
+        }  
     }
 }
 
@@ -240,37 +281,33 @@ function createDOMProjectCards(projectName) {
     image.src = folder;
 
     const title = document.createElement("span");
+    title.classList.add("project-title");
+
     const deleteBtn = document.createElement("button");
 
     title.textContent = projectName;
     deleteBtn.textContent = "X";
 
-    deleteBtn.addEventListener("click", () => {
+    deleteBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
         if (projectName === projectManager.selectedProject) {
             projectManager.selectedProject = null;
         }
 
         projectManager.removeProject(projectName)
-        renderFull();
+        renderProjects();
+        renderCurrentTab(projectManager.selectedTab);
     })
 
     projectCard.addEventListener("click", () => {
         projectManager.selectedProject = projectName;
-
-        if (document.querySelector(".project-list-item.selected")) {
-            document.querySelector(".project-list-item.selected").classList.remove("selected")
-        }
-
-        projectCard.classList.add("selected");
-
-        if (document.querySelector(".filter-btn.selected")) {
-            document.querySelector(".filter-btn.selected").classList.remove("selected");
-        }
-
+        projectManager.selectedTab = "upcoming";
+        document.querySelector(".rp")
+        document.querySelector(".filter-btn.selected")?.classList.remove("selected");
         DOM.button.filterUpcoming.classList.add("selected");
-        
-        renderUpcoming(projectManager.selectedProject);
-    }, true)
+        renderProjects();
+        renderCurrentTab(projectManager.selectedTab);
+    })
 
     projectCard.appendChild(image);
     projectCard.appendChild(title);
@@ -281,11 +318,12 @@ function createDOMProjectCards(projectName) {
 
 function renderUpcoming(projectName) {
     DOM.container.todos.innerHTML = "";
+    
 
     if (projectManager.selectedProject === null) {
         return;
     }
-    
+
     for (let i of projectManager.projects[projectName].todos) {
         const todo = i;
 
@@ -293,13 +331,39 @@ function renderUpcoming(projectName) {
             createDOMTodosCards(todo);
         }
     }
+
+    DOM.container.noProject.innerHTML = "";
+
+    if (DOM.container.todos.innerHTML === "") {
+        const image = document.createElement("img");
+        const noUpcomingText = document.createElement("h3");
+
+        image.src = note;
+        noUpcomingText.textContent = "No upcoming todos";
+
+        DOM.container.noProject.appendChild(image);
+        DOM.container.noProject.appendChild(noUpcomingText);
+    }
 }
 
 function renderCompleted(projectName) {
     DOM.container.todos.innerHTML = "";
-
+    
     if (projectManager.selectedProject === null) {
         return;
+    }
+
+    DOM.container.noProject.innerHTML = "";
+
+    if (projectManager.projects[projectName].completed.length === 0) {
+        const image = document.createElement("img");
+        const noUpcomingText = document.createElement("h3");
+
+        image.src = checkmark;
+        noUpcomingText.textContent = "No completed todos";
+
+        DOM.container.noProject.appendChild(image);
+        DOM.container.noProject.appendChild(noUpcomingText);
     }
     
     for (let i of projectManager.projects[projectName].completed) {
@@ -314,13 +378,26 @@ function renderOverdue(projectName) {
     if (projectManager.selectedProject === null) {
         return;
     }
-    
+
+    DOM.container.noProject.innerHTML = "";
+
     for (let i of projectManager.projects[projectName].todos) {
         const todo = i;
 
         if (isPast(todo.dueDate)) {
             createDOMTodosCards(todo);
         }
+    }
+
+    if (DOM.container.todos.innerHTML === "") {
+        const image = document.createElement("img");
+        const noUpcomingText = document.createElement("h3");
+
+        image.src = clock;
+        noUpcomingText.textContent = "No overdue todos";
+
+        DOM.container.noProject.appendChild(image);
+        DOM.container.noProject.appendChild(noUpcomingText);
     }
 }
 
@@ -371,7 +448,8 @@ function createDOMTodosCards(todo) {
 
     todoComplete.addEventListener("click", () => {
         projectManager.projects[projectManager.selectedProject].completeTodo(todo.id)
-        renderFull();
+        renderProjects();
+        renderCurrentTab(projectManager.selectedTab);
     })
 
     todoEdit.addEventListener("click", () => {
@@ -387,12 +465,12 @@ function createDOMTodosCards(todo) {
 
     todoDelete.addEventListener("click", () => {
         projectManager.projects[projectManager.selectedProject].removeTodo(todo.id)
-        renderFull();
+        renderProjects();
+        renderCurrentTab(projectManager.selectedTab);
     })
 
     todoCard.appendChild(todoComplete);
     todoCard.appendChild(todoTitle);
-    //todoCard.appendChild(todoDescription);
     todoCard.appendChild(todoDueDate);
     todoCard.appendChild(todoPriority);
     todoCard.appendChild(todoDelete);
@@ -420,12 +498,6 @@ function createDOMCompletedCards(todo) {
 //***************//
 //  DEV DISPLAY //
 //*************//
-
-function renderFull() {
-    renderProjects();
-    renderUpcoming(projectManager.selectedProject);
-}
-
 
 function renderCurrentTab(tab) {
     switch (tab) {
