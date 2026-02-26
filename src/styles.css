@@ -54,25 +54,6 @@ textarea {
     align-content: center;
 }
 
-.nav-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 5vh;
-}
-
-.nav-button {
-    border: none;
-    border-radius: 4px;
-    font-size: 1.1rem;
-    width: 8vw;
-    height: 4vh;
-}
-
-.nav-button:hover {
-    background-color: #316FF6;
-    color: white;
-}
-
 .sidebar-container {
     padding: 20px;
     background-color: white;
@@ -188,6 +169,20 @@ label {
     background-color: lightgray;
     padding: 0 20%;
     padding-top: 5%;
+}
+
+.filter-btn-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter-btn {
+    width: 30%;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 50px;
+    margin-bottom: 50px;
+    border: none;
 }
 
 .todo-header-container {

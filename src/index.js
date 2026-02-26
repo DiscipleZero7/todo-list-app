@@ -89,6 +89,9 @@ const DOM = {
         todoCreate: document.querySelector("#todo-create-btn"),
         todoCancel: document.querySelector("#todo-cancel-btn"),
         editCancel: document.querySelector("#edit-cancel-btn"),
+        filterUpcoming: document.querySelector("#upcoming-btn"),
+        filterOverdue: document.querySelector("#overdue-btn"),
+        filterCompleted: document.querySelector("#completed-btn"),
     },
 
     modal: {
@@ -109,6 +112,41 @@ const DOM = {
 }
 
 // Static DOM elements
+DOM.button.filterUpcoming.addEventListener("click", () => {
+    if (projectManager.selectedProject !== null) {
+        if (document.querySelector(".filter-btn.selected")) {
+            document.querySelector(".filter-btn.selected").classList.remove("selected");
+        }
+
+        DOM.button.filterUpcoming.classList.add("selected");
+    } else {
+        return;
+    }
+})
+
+DOM.button.filterOverdue.addEventListener("click", () => {
+    if (projectManager.selectedProject !== null) {
+        if (document.querySelector(".filter-btn.selected")) {
+            document.querySelector(".filter-btn.selected").classList.remove("selected");
+        }
+
+        DOM.button.filterOverdue.classList.add("selected");
+    } else {
+        return;
+    }
+})
+
+DOM.button.filterCompleted.addEventListener("click", () => {
+    if (projectManager.selectedProject !== null) {
+        if (document.querySelector(".filter-btn.selected")) {
+            document.querySelector(".filter-btn.selected").classList.remove("selected");
+        }
+
+        DOM.button.filterCompleted.classList.add("selected");
+    } else {
+        return;
+    }
+})
 
 // Project Form DOM
 DOM.button.projectModal.addEventListener("click", () => {
@@ -219,11 +257,17 @@ function createDOMProjectCards(projectName) {
     projectCard.addEventListener("click", () => {
         projectManager.selectedProject = projectName;
 
-        if (document.querySelector(".selected")) {
-            document.querySelector(".selected").classList.remove("selected")
+        if (document.querySelector(".project-list-item.selected")) {
+            document.querySelector(".project-list-item.selected").classList.remove("selected")
         }
 
         projectCard.classList.add("selected");
+
+        if (document.querySelector(".filter-btn.selected")) {
+            document.querySelector(".filter-btn.selected").classList.remove("selected");
+        }
+
+        DOM.button.filterUpcoming.classList.add("selected");
         
         renderUpcoming(projectManager.selectedProject);
     }, true)
