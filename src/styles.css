@@ -126,6 +126,9 @@ label {
 }
 
 .project-list-item {
+    max-width: 400px;
+    min-width: 200px;
+    width: 100%;
     list-style-type: none;
     display: flex;
     justify-content: flex-start;
@@ -154,10 +157,16 @@ label {
     margin-right: 10px;
 }
 
+.project-title {
+    flex:1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .project-list-item > button {
     width: 30px;
     height: 30px;
-    margin-left: auto;
     align-self: center;
     border-radius: 50%;
     border: none;
@@ -241,6 +250,14 @@ label {
     border-radius: 8px;
 }
 
+.todo-title {
+    flex:1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+}
+
 .todo-delete {
     position: absolute;
     top: 10px;
@@ -305,4 +322,17 @@ label {
 
 .no-project-container > img {
     filter: invert(75%);
+}
+
+#edit-modal {
+    padding: 20px;
+    border: none;
+    border-radius: 8px;
+}
+
+#edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
 }

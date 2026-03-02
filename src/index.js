@@ -11,10 +11,16 @@ const date = new Date();
 //console.log(format(date, "ccc, LLL d, k:mm a"))
 //////////
 
+
+let projectStorage = localStorage.getItem("projects");
+if (projectStorage === null) {
+    projectStorage = {default: createProject("default")};
+} else {
+    projectStorage = JSON.parse(localStorage.getItem("projects"))
+}
+
 /*export*/ const projectManager = {
-    projects: {
-        default: createProject("default"),
-    },
+    projects: projectStorage,
 
     selectedProject: null,
 
@@ -24,10 +30,49 @@ const date = new Date();
             return;
         }
         this.projects[title] = createProject(title)
+        localStorage.setItem("projects", JSON.stringify(projectManager.projects));
     },
 
     removeProject(title) {
-        delete this.projects[title]
+        delete this.projects[title];
+        localStorage.setItem("projects", JSON.stringify(projectManager.projects));
+    },
+
+    addTodo(title, description, dueDate, priority, time) {
+            this.projects[this.selectedProject].todos.push(createTodo(title, description, dueDate, priority, time));
+            localStorage.setItem("projects", JSON.stringify(projectManager.projects));
+        },
+
+    removeTodo(id) {
+        const index = this.projects[this.selectedProject].todos.findIndex(e => e.id === id);
+        this.projects[this.selectedProject].todos.splice(index, 1);
+        localStorage.setItem("projects", JSON.stringify(projectManager.projects));
+    },
+
+    completeTodo(id) {
+        const index = this.projects[this.selectedProject].todos.findIndex(e => e.id === id);
+        this.projects[this.selectedProject].todos[index].timeCompleted = format(new Date(Date.now()), "ccc, LLL d, h:mm a");
+        this.projects[this.selectedProject].completed.push(this.projects[this.selectedProject].todos.splice(index, 1)[0]);
+        localStorage.setItem("projects", JSON.stringify(projectManager.projects));
+    },
+
+    editTodo(id, newTitle, newDescription, newPriority, newTime, newDate) {
+        const index = this.projects[this.selectedProject].todos.findIndex(e => e.id === id);
+        this.projects[this.selectedProject].todos[index].title = newTitle;
+        this.projects[this.selectedProject].todos[index].description = newDescription;
+        this.projects[this.selectedProject].todos[index].priority = newPriority;
+        this.projects[this.selectedProject].todos[index].time = newTime;
+
+        if (newTime === "") {
+        let finalDate = new Date(newDate);
+        finalDate.setMinutes(finalDate.getTimezoneOffset());
+        finalDate.setHours(23, 59);
+        this.projects[this.selectedProject].todos[index].dueDate = finalDate
+        } else {
+            this.projects[this.selectedProject].todos[index].dueDate = new Date(newDate+"T"+newTime)
+        }
+
+        localStorage.setItem("projects", JSON.stringify(projectManager.projects));
     }
 }
 
@@ -42,35 +87,6 @@ function createProject(title) {
         completed: [],
         selectedTab: "upcoming",
         selectedTodo: null,
-        
-        addTodo(title, description, dueDate, priority, time) {
-            this.todos.push(createTodo(title, description, dueDate, priority, time))
-        },
-
-        removeTodo(id) {
-            const index = this.todos.findIndex(e => e.id === id);
-            this.todos.splice(index, 1);
-        },
-
-        completeTodo(id) {
-            const index = this.todos.findIndex(e => e.id === id);
-            this.todos[index].timeCompleted = format(new Date(Date.now()), "ccc, LLL d, h:mm a");
-            this.completed.push(this.todos.splice(index, 1)[0]);
-        },
-
-        editTodo(id, newTitle, newDescription, newPriority, newTime, newDate) {
-            const index = this.todos.findIndex(e => e.id === id);
-            this.todos[index].title = newTitle;
-            this.todos[index].description = newDescription;
-            this.todos[index].priority = newPriority;
-            this.todos[index].time = newTime;
-
-            if (newTime === "") {
-            this.todos[index].dueDate = new Date(newDate)
-            } else {
-                this.todos[index].dueDate = new Date(newDate+"T"+newTime)
-            }
-        }
     }
 }
 //***************************//
@@ -174,6 +190,7 @@ DOM.form.project.addEventListener("submit", () => {
     document.querySelector("#upcoming-btn").classList.add("selected");
     renderProjects();
     renderCurrentTab(projectManager.selectedTab);
+    
 })
 
 //**********
@@ -202,14 +219,15 @@ DOM.form.todo.addEventListener("submit", () => {
     if (todoDueTime === "") {
         finalDate = new Date(todoDueDate);
         finalDate.setMinutes(finalDate.getTimezoneOffset());
-        console.log(projectManager)
+        finalDate.setHours(23, 59);
     } else {
         finalDate = new Date(todoDueDate+"T"+todoDueTime)
     }
     ////////////////
     const todoPriority = document.querySelector("#todo-priority-input").value;
 
-    projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
+    //projectManager.projects[projectManager.selectedProject].addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
+    projectManager.addTodo(todoTitle, todoDescription, finalDate, todoPriority, todoDueTime)
 
     renderCurrentTab(projectManager.selectedTab);
     DOM.form.todo.reset();
@@ -217,7 +235,7 @@ DOM.form.todo.addEventListener("submit", () => {
 
 // Edit form NEED TO REFACTOR BIG TIME!!
 DOM.form.edit.addEventListener("submit", () => {
-    projectManager.projects[projectManager.selectedProject].editTodo(projectManager.projects[projectManager.selectedProject].selectedTodo, 
+    projectManager.editTodo(projectManager.projects[projectManager.selectedProject].selectedTodo, 
         document.querySelector("#edit-title-input").value,
         document.querySelector("#edit-description-input").value,
         document.querySelector("#edit-priority-input").value,
@@ -427,6 +445,7 @@ function createDOMTodosCards(todo) {
     todoDelete.textContent = `X`;
 
     todoCard.classList.add("todo-card");
+    todoTitle.classList.add("todo-title")
     todoPriority.classList.add("todo-priority")
     todoDelete.classList.add("todo-delete");
     todoEdit.classList.add("todo-edit")
@@ -447,7 +466,7 @@ function createDOMTodosCards(todo) {
     }
 
     todoComplete.addEventListener("click", () => {
-        projectManager.projects[projectManager.selectedProject].completeTodo(todo.id)
+        projectManager.completeTodo(todo.id)
         renderProjects();
         renderCurrentTab(projectManager.selectedTab);
     })
@@ -464,7 +483,7 @@ function createDOMTodosCards(todo) {
     })
 
     todoDelete.addEventListener("click", () => {
-        projectManager.projects[projectManager.selectedProject].removeTodo(todo.id)
+        projectManager.removeTodo(todo.id)
         renderProjects();
         renderCurrentTab(projectManager.selectedTab);
     })
@@ -484,6 +503,8 @@ function createDOMCompletedCards(todo) {
 
     const todoTitle = document.createElement("span");
     const todoCompletedDate = document.createElement("span");
+
+    todoTitle.classList.add("todo-title");
 
     todoTitle.textContent = `${todo.title}`;
     todoCompletedDate.textContent = `Completed on: ${todo.timeCompleted}`;
@@ -530,7 +551,7 @@ completedBtn.addEventListener("click", () => {
 
 upcomingBtn.addEventListener("click", () => {
     if (projectManager.selectedProject === null) {
-        alert("SELECT A PROJECT FOO!");
+        alert("Select a project first");
         return;
     }
     projectManager.projects[projectManager.selectedProject].selectedTab = "upcoming";
@@ -545,5 +566,7 @@ overdueBtn.addEventListener("click", () => {
     projectManager.projects[projectManager.selectedProject].selectedTab = "overdue";
     renderCurrentTab(projectManager.projects[projectManager.selectedProject].selectedTab)
 })
+
+console.log(projectManager)
 
 //Experimental branch 2
