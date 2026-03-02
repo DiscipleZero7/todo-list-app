@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<script defer src="main.js"></script></head>
+<body>
+    <div class="layout-container">
+        <div class="header-container">
+            <h1 class="header-title">Todo Simply</h1>
+        </div>
+            
+        <div class="sidebar-container">
+            <div class="project-list-header">
+                <h2>Projects</h2>
+                <button id="project-modal-btn">New Project +</button>
+            </div>
+            
+            <ul class="project-list"></ul>
+        </div>
+
+        
+
+        <div class="content">
+            <div class="filter-btn-container">
+                <button id="upcoming-btn" class="filter-btn">Upcoming</button>
+                <button id="overdue-btn" class="filter-btn">Overdue</button>
+                <button id="completed-btn" class="filter-btn">Completed</button>
+            </div>
+
+            <div class="todo-container">
+                <div class="todo-header-container">
+                    <h2>Todos</h2>
+                    <button id="todo-modal-btn">New Todo +</button>
+                </div>
+                <div class="todo-list"></div>
+                <div class="no-project-container"></div>
+            </div>
+        </div>        
+    </div>
+    
+    <!-- MODALS -->
+
+    <dialog id="project-modal">
+        <h3>Create new project folder to store your todos</h3>
+        <form method="dialog" id="project-form">
+            <div class="input-container">
+                <label for="project-input">Project</label>
+                <input id="project-input" type="text" placeholder="Project name..." required>
+            </div>
+            <div class="modal-btn-container">
+                <button id="project-cancel-btn" type="button">Cancel</button>
+                <button id="project-create-btn" type="submit">Done</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="todo-modal">
+        <h3>Create new todo</h3>
+        <form method="dialog" id="todo-form">
+            <div class="input-container">
+                <label for="todo-title-input">Title*</label>
+                <input id="todo-title-input" type="text" required>
+            </div>
+            <div class="input-container">
+                <label for="todo-dueDate-input">Due date*</label>
+                <input id="todo-dueDate-input" type="date" required>
+            </div>
+            <div class="input-container">
+                <label for="todo-time-input">Time</label>
+                <input id="todo-time-input" type="time">
+            </div>
+            <div class="input-container">
+                <label for="todo-priority-input">Priority</label>
+                <select name="priority" id="todo-priority-input" required>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="todo-description-input">Description</label>
+                <textarea id="todo-description-input" maxlength="200"></textarea>
+            </div>
+            <div class="modal-btn-container">
+                <button id="todo-cancel-btn" type="button">Cancel</button>
+                <button id="todo-create-btn" type="submit">Add todo</button>
+            </div>
+        </form>
+    </dialog>
+    
+    <dialog id="edit-modal">
+        <h3>Edit todo</h3>
+        <form method="dialog" id="edit-form">
+            <div class="input-container">
+                <label for="edit-title-input">Title*</label>
+                <input id="edit-title-input" type="text" required>
+            </div>
+            <div class="input-container">
+                <label for="edit-dueDate-input">Due date*</label>
+                <input id="edit-dueDate-input" type="date" required>
+            </div>
+            <div class="input-container">
+                <label for="edit-time-input">Time</label>
+                <input id="edit-time-input" type="time">
+            </div>
+            <div class="input-container">
+                <label for="edit-priority-input">Priority</label>
+                <select name="priority" id="edit-priority-input" required>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="edit-description-input">Description</label>
+                <textarea id="edit-description-input" maxlength="200"></textarea>
+            </div>
+            <div class="modal-btn-container">
+                <button id="edit-cancel-btn" type="button">Cancel</button>
+                <button id="edit-create-btn" type="submit">Confirm changes</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
